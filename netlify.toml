@@ -1,0 +1,22 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+  command = "echo 'No build step required'"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Optional: gives your frontend a shorter path to call.
+# Frontend already calls /.netlify/functions/chat directly, so this is
+# a convenience alias — safe to keep or remove.
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
