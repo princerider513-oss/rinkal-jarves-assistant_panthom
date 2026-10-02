@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>rinkal bhai ka jarves assistant</title>
 <meta name="description" content="rinkal bhai ka jarves assistant - a futuristic voice-enabled AI assistant">
+
 <style>
   :root{
     --bg-0:#04060d;
@@ -25,8 +26,14 @@
 
   *{box-sizing:border-box;}
 
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
-  html,body{height:100%;margin:0;}
+  html{
+    scroll-padding-top:env(safe-area-inset-top,0px);
+  }
+
+  html,body{
+    height:100%;
+    margin:0;
+  }
 
   body{
     background:
@@ -42,6 +49,7 @@
   }
 
   /* ---------- header ---------- */
+
   header{
     width:100%;
     max-width:720px;
@@ -95,6 +103,7 @@
   }
 
   /* ---------- core ---------- */
+
   .core-section{
     display:flex;
     flex-direction:column;
@@ -173,8 +182,14 @@
   }
 
   @keyframes pulse{
-    0%{transform:scale(.82);opacity:.55}
-    100%{transform:scale(1.3);opacity:0}
+    0%{
+      transform:scale(.82);
+      opacity:.55
+    }
+    100%{
+      transform:scale(1.3);
+      opacity:0
+    }
   }
 
   @keyframes glow{
@@ -203,6 +218,7 @@
   }
 
   /* ---------- chat ---------- */
+
   main{
     width:100%;
     max-width:720px;
@@ -300,6 +316,7 @@
   }
 
   /* ---------- input row ---------- */
+
   .input-row{
     display:flex;
     gap:8px;
@@ -384,6 +401,7 @@
   }
 
   @media (max-width:420px){
+
     .core-wrap{
       width:150px;
       height:150px;
@@ -415,17 +433,28 @@
   <p class="tagline">Your personal voice-powered AI assistant</p>
 
   <div class="lang-toggle" id="langToggle">
-    <button class="lang-btn active" data-lang="en" id="btnEn" type="button">English</button>
-    <button class="lang-btn" data-lang="hi" id="btnHi" type="button">हिंदी</button>
+    <button class="lang-btn active" data-lang="en" id="btnEn" type="button">
+      English
+    </button>
+
+    <button class="lang-btn" data-lang="hi" id="btnHi" type="button">
+      हिंदी
+    </button>
   </div>
 </header>
 
 <section class="core-section">
+
   <div class="core-wrap" id="coreWrap">
     <div class="ring ring1"></div>
     <div class="ring ring2"></div>
 
-    <button class="core-btn" id="coreBtn" type="button" aria-label="Tap to speak">
+    <button
+      class="core-btn"
+      id="coreBtn"
+      type="button"
+      aria-label="Tap to speak"
+    >
       TAP TO<br>SPEAK
     </button>
   </div>
@@ -433,6 +462,7 @@
   <div class="mic-status" id="micStatus">
     Tap the core to talk to Jarvis
   </div>
+
 </section>
 
 <main>
@@ -440,6 +470,7 @@
   <div class="chat-panel" id="chatPanel"></div>
 
   <div class="input-row">
+
     <input
       type="text"
       id="textInput"
@@ -448,17 +479,32 @@
       autocomplete="off"
     >
 
-    <button class="btn btn-send" id="sendBtn" type="button">
+    <button
+      class="btn btn-send"
+      id="sendBtn"
+      type="button"
+    >
       Send
     </button>
+
   </div>
 
   <div class="row-2">
-    <button class="btn-clear" id="clearBtn" type="button">
+
+    <button
+      class="btn-clear"
+      id="clearBtn"
+      type="button"
+    >
       Clear chat
     </button>
 
-    <span class="footnote" id="apiNote" style="margin:0;"></span>
+    <span
+      class="footnote"
+      id="apiNote"
+      style="margin:0;"
+    ></span>
+
   </div>
 
   <p class="footnote">
@@ -470,46 +516,73 @@
 
 <script>
 (function(){
+
   "use strict";
 
   /* ---------------- state ---------------- */
 
   var currentLang = 'en';
+
   var conversation = [];
+
   var MAX_HISTORY = 16;
+
   var isBusy = false;
 
   var recognition = null;
+
   var recognizing = false;
 
   var synth = window.speechSynthesis;
 
-  /* FIRST TAP GREETING */
+  /*
+    First tap:
+    "Hello Priyansh boss, how are you?"
+
+    Second tap:
+    microphone / speech recognition
+  */
   var firstTapDone = false;
+
 
   /* ---------------- dom ---------------- */
 
-  var chatPanel   = document.getElementById('chatPanel');
-  var micStatus   = document.getElementById('micStatus');
-  var coreWrap    = document.getElementById('coreWrap');
-  var coreBtn     = document.getElementById('coreBtn');
-  var textInput   = document.getElementById('textInput');
-  var sendBtn     = document.getElementById('sendBtn');
-  var clearBtn    = document.getElementById('clearBtn');
-  var btnEn       = document.getElementById('btnEn');
-  var btnHi       = document.getElementById('btnHi');
-  var apiNote     = document.getElementById('apiNote');
+  var chatPanel = document.getElementById('chatPanel');
+
+  var micStatus = document.getElementById('micStatus');
+
+  var coreWrap = document.getElementById('coreWrap');
+
+  var coreBtn = document.getElementById('coreBtn');
+
+  var textInput = document.getElementById('textInput');
+
+  var sendBtn = document.getElementById('sendBtn');
+
+  var clearBtn = document.getElementById('clearBtn');
+
+  var btnEn = document.getElementById('btnEn');
+
+  var btnHi = document.getElementById('btnHi');
+
+  var apiNote = document.getElementById('apiNote');
+
 
   /* ---------------- language ---------------- */
 
   function setLang(lang){
+
     currentLang = lang;
 
     btnEn.classList.toggle('active', lang === 'en');
+
     btnHi.classList.toggle('active', lang === 'hi');
 
     if(recognition){
-      recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-US';
+      recognition.lang =
+        lang === 'hi'
+          ? 'hi-IN'
+          : 'en-US';
     }
 
     textInput.placeholder =
@@ -524,35 +597,45 @@
     );
   }
 
+
   btnEn.addEventListener('click', function(){
     setLang('en');
   });
+
 
   btnHi.addEventListener('click', function(){
     setLang('hi');
   });
 
+
   /* ---------------- helpers ---------------- */
 
   function setMicStatus(text, kind){
+
     micStatus.textContent = text;
 
     micStatus.className =
-      'mic-status' + (kind ? ' ' + kind : '');
+      'mic-status' +
+      (kind ? ' ' + kind : '');
   }
 
+
   function addMessageToUI(role, text){
+
     var div = document.createElement('div');
 
     div.className =
-      'msg ' + (role === 'user' ? 'user' : 'jarvis');
+      'msg ' +
+      (role === 'user' ? 'user' : 'jarvis');
 
     var who = document.createElement('span');
 
     who.className = 'who';
 
     who.textContent =
-      role === 'user' ? 'You' : 'Jarvis';
+      role === 'user'
+        ? 'You'
+        : 'Jarvis';
 
     div.appendChild(who);
 
@@ -568,10 +651,13 @@
       chatPanel.scrollHeight;
   }
 
+
   function showThinking(){
+
     var div = document.createElement('div');
 
     div.className = 'thinking';
+
     div.id = 'thinkingIndicator';
 
     div.innerHTML =
@@ -583,22 +669,29 @@
       chatPanel.scrollHeight;
   }
 
+
   function hideThinking(){
+
     var el =
-      document.getElementById('thinkingIndicator');
+      document.getElementById(
+        'thinkingIndicator'
+      );
 
     if(el){
       el.remove();
     }
   }
 
+
   function pushHistory(role, content){
+
     conversation.push({
       role: role,
       content: content
     });
 
     if(conversation.length > MAX_HISTORY){
+
       conversation =
         conversation.slice(
           conversation.length - MAX_HISTORY
@@ -606,92 +699,117 @@
     }
   }
 
-  /* ---------------- improved speech synthesis ---------------- */
+
+  /* ---------------- speech synthesis ---------------- */
+
+  /*
+    Hindi voice selection:
+    1. Exact hi-IN
+    2. Any voice starting with hi
+    3. Voice names containing Hindi/India
+  */
 
   function getHindiVoice(){
-    if(!synth) return null;
 
-    var voices = synth.getVoices() || [];
-
-    var exactHindi = null;
-    var indianHindi = null;
-
-    for(var i = 0; i < voices.length; i++){
-
-      var voice = voices[i];
-      var lang = (voice.lang || '').toLowerCase();
-      var name = (voice.name || '').toLowerCase();
-
-      /*
-       * First preference:
-       * Exact Hindi-India voices.
-       */
-      if(lang === 'hi-in'){
-        exactHindi = voice;
-        break;
-      }
-
-      /*
-       * Second preference:
-       * Any Hindi voice.
-       */
-      if(
-        !indianHindi &&
-        (
-          lang.indexOf('hi') === 0 ||
-          name.indexOf('hindi') !== -1 ||
-          name.indexOf('india') !== -1
-        )
-      ){
-        indianHindi = voice;
-      }
+    if(!synth){
+      return null;
     }
-
-    return exactHindi || indianHindi || null;
-  }
-
-  function pickVoice(langTag){
-
-    if(!synth) return null;
 
     var voices =
       synth.getVoices() || [];
 
     var exact = null;
+
+    var hindiLang = null;
+
+    var namedHindi = null;
+
+    for(var i = 0; i < voices.length; i++){
+
+      var voice = voices[i];
+
+      var lang =
+        (voice.lang || '').toLowerCase();
+
+      var name =
+        (voice.name || '').toLowerCase();
+
+      if(lang === 'hi-in'){
+        exact = voice;
+        break;
+      }
+
+      if(
+        !hindiLang &&
+        lang.indexOf('hi') === 0
+      ){
+        hindiLang = voice;
+      }
+
+      if(
+        !namedHindi &&
+        (
+          name.indexOf('hindi') !== -1 ||
+          name.indexOf('india') !== -1
+        )
+      ){
+        namedHindi = voice;
+      }
+    }
+
+    return exact ||
+      hindiLang ||
+      namedHindi ||
+      null;
+  }
+
+
+  function pickVoice(langTag){
+
+    if(!synth){
+      return null;
+    }
+
+    if(langTag === 'hi-IN'){
+
+      return getHindiVoice();
+    }
+
+    var voices =
+      synth.getVoices() || [];
+
+    var exact = null;
+
     var partial = null;
 
     for(var i = 0; i < voices.length; i++){
 
-      var lang =
-        (voices[i].lang || '').toLowerCase();
-
-      var wanted =
-        langTag.toLowerCase();
-
-      if(lang === wanted){
+      if(
+        voices[i].lang === langTag
+      ){
         exact = voices[i];
         break;
       }
 
       if(
         !partial &&
-        lang.indexOf(
-          wanted.split('-')[0]
-        ) === 0
+        voices[i].lang &&
+        voices[i].lang
+          .toLowerCase()
+          .indexOf(
+            langTag
+              .split('-')[0]
+          ) === 0
       ){
         partial = voices[i];
       }
     }
 
-    /*
-     * Special Hindi handling.
-     */
-    if(langTag === 'hi-IN'){
-      return getHindiVoice() || exact || partial || null;
-    }
-
-    return exact || partial || null;
+    return exact ||
+      partial ||
+      null;
   }
+
 
   function speak(text){
 
@@ -716,33 +834,42 @@
 
         u.lang = langTag;
 
-        var voice =
+        var v =
           pickVoice(langTag);
 
-        if(voice){
-          u.voice = voice;
+        if(v){
+          u.voice = v;
         }
 
         /*
-         * Hindi ko thoda natural/slower rakha hai.
-         */
+          Hindi is slightly slower so it sounds
+          more natural on Android TTS.
+        */
         if(currentLang === 'hi'){
           u.rate = 0.88;
-          u.pitch = 1.0;
         }else{
           u.rate = 1.0;
-          u.pitch = 1.0;
         }
+
+        u.pitch = 1.0;
 
         coreWrap.classList.add('speaking');
 
         u.onend = function(){
-          coreWrap.classList.remove('speaking');
+
+          coreWrap.classList.remove(
+            'speaking'
+          );
+
           resolve();
         };
 
         u.onerror = function(){
-          coreWrap.classList.remove('speaking');
+
+          coreWrap.classList.remove(
+            'speaking'
+          );
+
           resolve();
         };
 
@@ -750,17 +877,90 @@
 
       }catch(e){
 
-        coreWrap.classList.remove('speaking');
+        coreWrap.classList.remove(
+          'speaking'
+        );
+
         resolve();
-
       }
-
     });
   }
 
+
+  /*
+    First-tap English greeting.
+  */
+
+  function speakEnglishGreeting(){
+
+    return new Promise(function(resolve){
+
+      if(!synth){
+        resolve();
+        return;
+      }
+
+      try{
+
+        synth.cancel();
+
+        var u =
+          new SpeechSynthesisUtterance(
+            'Hello Priyansh boss, how are you?'
+          );
+
+        u.lang = 'en-US';
+
+        var v =
+          pickVoice('en-US');
+
+        if(v){
+          u.voice = v;
+        }
+
+        u.rate = 1.0;
+
+        u.pitch = 1.0;
+
+        coreWrap.classList.add(
+          'speaking'
+        );
+
+        u.onend = function(){
+
+          coreWrap.classList.remove(
+            'speaking'
+          );
+
+          resolve();
+        };
+
+        u.onerror = function(){
+
+          coreWrap.classList.remove(
+            'speaking'
+          );
+
+          resolve();
+        };
+
+        synth.speak(u);
+
+      }catch(e){
+
+        coreWrap.classList.remove(
+          'speaking'
+        );
+
+        resolve();
+      }
+    });
+  }
+
+
   /* ---------------- speech recognition ---------------- */
 
-  function createRecognition(){
+  function setupRecognition(){
 
     var SR =
       window.SpeechRecognition ||
@@ -778,20 +978,78 @@
         : 'en-US';
 
     r.continuous = false;
+
     r.interimResults = false;
+
     r.maxAlternatives = 1;
 
     return r;
   }
 
-  function startListening(){
 
-    if(isBusy || recognizing){
+  /*
+    Explicitly request microphone permission.
+
+    This makes Chrome show the site's
+    microphone permission when required.
+  */
+
+  function requestMicrophonePermission(){
+
+    if(
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ){
+      return Promise.resolve(true);
+    }
+
+    return navigator.mediaDevices
+      .getUserMedia({
+        audio:true
+      })
+      .then(function(stream){
+
+        /*
+          We only need the permission.
+          SpeechRecognition will use the mic
+          afterwards, so stop this temporary stream.
+        */
+
+        stream.getTracks()
+          .forEach(function(track){
+            track.stop();
+          });
+
+        return true;
+      })
+
+      .catch(function(error){
+
+        console.error(
+          'Microphone permission error:',
+          error
+        );
+
+        setMicStatus(
+          currentLang === 'hi'
+            ? 'माइक्रोफ़ोन की अनुमति नहीं मिली। साइट सेटिंग्स में Microphone को Allow करें।'
+            : 'Microphone permission denied. Allow microphone access in site settings.',
+          'err'
+        );
+
+        return false;
+      });
+  }
+
+
+  function actuallyStartRecognition(){
+
+    if(isBusy){
       return;
     }
 
     recognition =
-      createRecognition();
+      setupRecognition();
 
     if(!recognition){
 
@@ -810,109 +1068,142 @@
         ? 'hi-IN'
         : 'en-US';
 
-    recognition.onstart = function(){
 
-      recognizing = true;
+    recognition.onstart =
+      function(){
 
-      coreWrap.classList.add('listening');
+        recognizing = true;
 
-      coreBtn.disabled = false;
+        coreWrap.classList.add(
+          'listening'
+        );
 
-      setMicStatus(
-        currentLang === 'hi'
-          ? '🎙️ सुन रहा हूँ... बोलिए'
-          : '🎙️ Listening... speak now'
-      );
-    };
-
-    recognition.onresult = function(e){
-
-      var text =
-        (
-          e.results &&
-          e.results[0] &&
-          e.results[0][0] &&
-          e.results[0][0].transcript
-        ) || '';
-
-      text = text.trim();
-
-      coreWrap.classList.remove('listening');
-
-      recognizing = false;
-
-      if(!text){
+        coreBtn.disabled = true;
 
         setMicStatus(
           currentLang === 'hi'
-            ? 'कुछ सुनाई नहीं दिया। फिर कोशिश करें।'
-            : 'Didn\'t catch anything. Try again.',
-          'err'
+            ? 'सुन रहा हूँ...'
+            : 'Listening...',
+          'ok'
+        );
+      };
+
+
+    recognition.onresult =
+      function(e){
+
+        var text =
+          (
+            e.results &&
+            e.results[0] &&
+            e.results[0][0] &&
+            e.results[0][0].transcript
+          ) || '';
+
+        text = text.trim();
+
+        coreWrap.classList.remove(
+          'listening'
         );
 
-        return;
-      }
+        coreBtn.disabled = false;
 
-      setMicStatus(
-        currentLang === 'hi'
-          ? 'मिल गया, सोच रहा हूँ...'
-          : 'Got it — thinking...'
-      );
+        recognizing = false;
 
-      sendToJarvis(text);
-    };
+        if(!text){
 
-    recognition.onerror = function(e){
+          setMicStatus(
+            currentLang === 'hi'
+              ? 'कुछ सुनाई नहीं दिया। फिर कोशिश करें।'
+              : 'Didn\'t catch anything. Try again.',
+            'err'
+          );
 
-      coreWrap.classList.remove('listening');
+          return;
+        }
 
-      recognizing = false;
-
-      var errMsg;
-
-      if(e && e.error === 'not-allowed'){
-
-        errMsg =
+        setMicStatus(
           currentLang === 'hi'
-            ? 'माइक्रोफ़ोन की अनुमति नहीं मिली। Chrome की microphone permission जांचें।'
-            : 'Microphone permission denied. Check Chrome microphone permission.';
+            ? 'मिल गया, सोच रहा हूँ...'
+            : 'Got it — thinking...'
+        );
 
-      }else if(e && e.error === 'no-speech'){
+        sendToJarvis(text);
+      };
 
-        errMsg =
-          currentLang === 'hi'
-            ? 'कोई आवाज़ नहीं सुनाई दी। फिर कोशिश करें।'
-            : 'No speech detected. Try again.';
 
-      }else if(e && e.error === 'network'){
+    recognition.onerror =
+      function(e){
 
-        errMsg =
-          currentLang === 'hi'
-            ? 'वॉइस सर्विस से कनेक्शन में समस्या हुई। इंटरनेट जांचें।'
-            : 'Voice service connection problem. Check your internet.';
-
-      }else{
-
-        errMsg =
-          currentLang === 'hi'
-            ? 'सुनने में समस्या हुई। फिर कोशिश करें।'
-            : 'Trouble listening. Please try again.';
-      }
-
-      setMicStatus(errMsg, 'err');
-    };
-
-    recognition.onend = function(){
-
-      coreWrap.classList.remove('listening');
-
-      recognizing = false;
-
-      if(!isBusy){
+        coreWrap.classList.remove(
+          'listening'
+        );
 
         coreBtn.disabled = false;
-      }
-    };
+
+        recognizing = false;
+
+        var errMsg;
+
+        if(
+          e &&
+          (
+            e.error === 'not-allowed' ||
+            e.error === 'service-not-allowed'
+          )
+        ){
+
+          errMsg =
+            currentLang === 'hi'
+              ? 'माइक्रोफ़ोन की अनुमति नहीं मिली। Site Settings में Microphone को Allow करें।'
+              : 'Microphone permission denied. Allow microphone access in site settings.';
+
+        }else if(
+          e &&
+          e.error === 'no-speech'
+        ){
+
+          errMsg =
+            currentLang === 'hi'
+              ? 'कोई आवाज़ नहीं सुनाई दी।'
+              : 'No speech detected.';
+
+        }else{
+
+          errMsg =
+            currentLang === 'hi'
+              ? 'सुनने में समस्या हुई। फिर कोशिश करें।'
+              : 'Trouble listening. Please try again.';
+        }
+
+        setMicStatus(
+          errMsg,
+          'err'
+        );
+      };
+
+
+    recognition.onend =
+      function(){
+
+        coreWrap.classList.remove(
+          'listening'
+        );
+
+        coreBtn.disabled = false;
+
+        recognizing = false;
+
+        if(!isBusy){
+
+          setMicStatus(
+            currentLang === 'hi'
+              ? 'फिर से बोलने के लिए टैप करें'
+              : 'Tap to speak again'
+          );
+        }
+      };
+
 
     try{
 
@@ -920,164 +1211,178 @@
 
     }catch(e){
 
-      coreWrap.classList.remove('listening');
+      console.error(
+        'Recognition start error:',
+        e
+      );
+
+      coreWrap.classList.remove(
+        'listening'
+      );
+
+      coreBtn.disabled = false;
 
       recognizing = false;
 
       setMicStatus(
         currentLang === 'hi'
-          ? 'माइक्रोफ़ोन शुरू नहीं हो सका। फिर टैप करें।'
-          : 'Could not start the microphone. Tap again.',
+          ? 'माइक्रोफ़ोन शुरू नहीं हो सका।'
+          : 'Could not start the microphone.',
         'err'
       );
     }
   }
 
-  /* ---------------- first tap + microphone ---------------- */
 
-  coreBtn.addEventListener('click', function(){
+  function startListening(){
 
-    if(isBusy || recognizing){
+    if(
+      recognizing ||
+      isBusy
+    ){
       return;
     }
 
     /*
-     * FIRST TAP:
-     * Jarvis greets the boss.
-     */
-    if(!firstTapDone){
+      First make sure the browser has
+      microphone permission.
+    */
 
-      firstTapDone = true;
+    requestMicrophonePermission()
+      .then(function(allowed){
 
-      setMicStatus(
-        'Hello Priyansh boss, how are you?'
-      );
-
-      speakEnglishGreeting();
-
-      return;
-    }
-
-    startListening();
-  });
-
-  function speakEnglishGreeting(){
-
-    if(!synth){
-      startListening();
-      return;
-    }
-
-    try{
-
-      synth.cancel();
-
-      var greeting =
-        new SpeechSynthesisUtterance(
-          'Hello Priyansh boss, how are you?'
-        );
-
-      greeting.lang = 'en-US';
-
-      var voices =
-        synth.getVoices() || [];
-
-      var englishVoice = null;
-
-      for(var i = 0; i < voices.length; i++){
-
-        var lang =
-          (voices[i].lang || '').toLowerCase();
-
-        if(lang === 'en-us'){
-          englishVoice = voices[i];
-          break;
+        if(!allowed){
+          return;
         }
-      }
 
-      if(englishVoice){
-        greeting.voice = englishVoice;
-      }
+        actuallyStartRecognition();
 
-      greeting.rate = 0.95;
-      greeting.pitch = 1.0;
-
-      coreWrap.classList.add('speaking');
-
-      greeting.onend = function(){
-
-        coreWrap.classList.remove('speaking');
-
-        setMicStatus(
-          'Tap again and speak...'
-        );
-      };
-
-      greeting.onerror = function(){
-
-        coreWrap.classList.remove('speaking');
-
-        setMicStatus(
-          'Tap again and speak...'
-        );
-      };
-
-      synth.speak(greeting);
-
-    }catch(e){
-
-      coreWrap.classList.remove('speaking');
-
-      setMicStatus(
-        'Tap again and speak...'
-      );
-    }
+      });
   }
+
+
+  /* ---------------- core button ---------------- */
+
+  coreBtn.addEventListener(
+    'click',
+    function(){
+
+      if(
+        recognizing ||
+        isBusy
+      ){
+        return;
+      }
+
+      /*
+        FIRST TAP:
+        Say greeting only.
+      */
+
+      if(!firstTapDone){
+
+        firstTapDone = true;
+
+        coreBtn.disabled = true;
+
+        setMicStatus(
+          'Hello boss...'
+        );
+
+        speakEnglishGreeting()
+          .then(function(){
+
+            coreBtn.disabled = false;
+
+            setMicStatus(
+              currentLang === 'hi'
+                ? 'अब बोलने के लिए फिर से टैप करें'
+                : 'Tap again to speak'
+            );
+          });
+
+        return;
+      }
+
+      /*
+        SECOND AND FUTURE TAPS:
+        Ask for microphone permission
+        and start speech recognition.
+      */
+
+      startListening();
+    }
+  );
+
 
   /* ---------------- backend call ---------------- */
 
   function sendToJarvis(userText){
 
-    if(!userText || !userText.trim() || isBusy){
+    if(
+      !userText ||
+      !userText.trim() ||
+      isBusy
+    ){
       return;
     }
 
     isBusy = true;
 
     sendBtn.disabled = true;
+
     coreBtn.disabled = true;
+
     textInput.disabled = true;
 
-    addMessageToUI('user', userText);
 
-    pushHistory('user', userText);
+    addMessageToUI(
+      'user',
+      userText
+    );
+
+    pushHistory(
+      'user',
+      userText
+    );
 
     showThinking();
 
-    fetch('/.netlify/functions/chat', {
-      method: 'POST',
 
-      headers:{
-        'Content-Type':'application/json'
-      },
+    fetch(
+      '/.netlify/functions/chat',
+      {
+        method:'POST',
 
-      body:JSON.stringify({
-        messages:conversation,
-        lang:currentLang
-      })
-    })
+        headers:{
+          'Content-Type':
+            'application/json'
+        },
+
+        body:JSON.stringify({
+
+          messages:
+            conversation,
+
+          lang:
+            currentLang
+
+        })
+      }
+    )
 
     .then(function(res){
 
-      return res.json().then(function(data){
+      return res.json()
+        .then(function(data){
 
-        return {
-          ok:res.ok,
-          status:res.status,
-          data:data
-        };
+          return {
+            ok:res.ok,
+            status:res.status,
+            data:data
+          };
 
-      });
+        });
 
     })
 
@@ -1085,15 +1390,20 @@
 
       hideThinking();
 
+
       if(!result.ok){
 
         var errText =
-          (result.data && result.data.error) ||
+          (
+            result.data &&
+            result.data.error
+          ) ||
           (
             currentLang === 'hi'
               ? 'कुछ गड़बड़ हो गई।'
               : 'Something went wrong.'
           );
+
 
         if(result.status === 429){
 
@@ -1113,6 +1423,7 @@
               : 'Trouble reaching the AI service. Please try again later.';
         }
 
+
         addMessageToUI(
           'jarvis',
           errText
@@ -1128,6 +1439,7 @@
         return;
       }
 
+
       var reply =
         (
           result.data &&
@@ -1135,6 +1447,7 @@
         )
           ? result.data.reply.trim()
           : '';
+
 
       if(!reply){
 
@@ -1144,15 +1457,18 @@
             : 'Sorry boss, I didn\'t get a reply.';
       }
 
+
       addMessageToUI(
         'jarvis',
         reply
       );
 
+
       pushHistory(
         'assistant',
         reply
       );
+
 
       setMicStatus(
         currentLang === 'hi'
@@ -1161,23 +1477,33 @@
         'ok'
       );
 
+
       speak(reply);
 
     })
 
-    .catch(function(){
+
+    .catch(function(error){
+
+      console.error(
+        'Network error:',
+        error
+      );
 
       hideThinking();
+
 
       var netErr =
         currentLang === 'hi'
           ? 'नेटवर्क में समस्या है। इंटरनेट जांचें।'
           : 'Network problem — please check your connection.';
 
+
       addMessageToUI(
         'jarvis',
         netErr
       );
+
 
       setMicStatus(
         netErr,
@@ -1186,69 +1512,91 @@
 
     })
 
+
     .finally(function(){
 
       isBusy = false;
 
       sendBtn.disabled = false;
+
       coreBtn.disabled = false;
+
       textInput.disabled = false;
 
       textInput.focus();
     });
   }
 
+
   /* ---------------- text input ---------------- */
 
-  sendBtn.addEventListener('click', function(){
+  sendBtn.addEventListener(
+    'click',
+    function(){
 
-    var val = textInput.value;
-
-    textInput.value = '';
-
-    sendToJarvis(val);
-  });
-
-  textInput.addEventListener('keydown', function(e){
-
-    if(e.key === 'Enter' && !e.shiftKey){
-
-      e.preventDefault();
-
-      var val = textInput.value;
+      var val =
+        textInput.value;
 
       textInput.value = '';
 
       sendToJarvis(val);
     }
-  });
+  );
+
+
+  textInput.addEventListener(
+    'keydown',
+    function(e){
+
+      if(
+        e.key === 'Enter' &&
+        !e.shiftKey
+      ){
+
+        e.preventDefault();
+
+        var val =
+          textInput.value;
+
+        textInput.value = '';
+
+        sendToJarvis(val);
+      }
+    }
+  );
+
 
   /* ---------------- clear chat ---------------- */
 
-  clearBtn.addEventListener('click', function(){
+  clearBtn.addEventListener(
+    'click',
+    function(){
 
-    if(isBusy){
-      return;
-    }
+      if(isBusy){
+        return;
+      }
 
-    var msg =
-      currentLang === 'hi'
-        ? 'क्या आप पूरी बातचीत मिटाना चाहते हैं?'
-        : 'Clear the entire conversation?';
-
-    if(window.confirm(msg)){
-
-      chatPanel.innerHTML = '';
-
-      conversation = [];
-
-      setMicStatus(
+      var msg =
         currentLang === 'hi'
-          ? 'बातचीत साफ़ हो गई'
-          : 'Chat cleared'
-      );
+          ? 'क्या आप पूरी बातचीत मिटाना चाहते हैं?'
+          : 'Clear the entire conversation?';
+
+
+      if(window.confirm(msg)){
+
+        chatPanel.innerHTML = '';
+
+        conversation = [];
+
+        setMicStatus(
+          currentLang === 'hi'
+            ? 'बातचीत साफ़ हो गई'
+            : 'Chat cleared'
+        );
+      }
     }
-  });
+  );
+
 
   /* ---------------- init ---------------- */
 
@@ -1257,13 +1605,15 @@
     synth.onvoiceschanged !== undefined
   ){
 
-    synth.onvoiceschanged = function(){
-      /*
-       * Browser voices loaded.
-       * Hindi voice selection will use them automatically.
-       */
-    };
+    synth.onvoiceschanged =
+      function(){
+        /*
+          Voices are loaded lazily
+          by the browser.
+        */
+      };
   }
+
 
   setLang('en');
 
@@ -1271,4 +1621,4 @@
 </script>
 
 </body>
-</html>
+  </html>
