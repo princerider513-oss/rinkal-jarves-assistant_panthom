@@ -1,6 +1,6 @@
 'use strict';
 
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 
 exports.handler = async function (event) {
   const headers = {
@@ -14,14 +14,12 @@ exports.handler = async function (event) {
     body: JSON.stringify(body)
   });
 
-  // Only POST is allowed
   if (event.httpMethod !== 'POST') {
     return respond(405, {
       error: 'Method not allowed. Use POST.'
     });
   }
 
-  // Check API key
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -30,7 +28,6 @@ exports.handler = async function (event) {
     });
   }
 
-  // Parse request
   let payload;
 
   try {
@@ -49,7 +46,6 @@ exports.handler = async function (event) {
     });
   }
 
-  // Convert messages to Gemini format
   const contents = payload.messages
     .slice(-16)
     .filter(
@@ -77,7 +73,6 @@ exports.handler = async function (event) {
     });
   }
 
-  // Jarvis instructions
   const systemText =
     lang === 'hi'
       ? 'You are Jarvis, a friendly and helpful personal AI assistant. Reply naturally in Hindi written in Devanagari. If the user writes in Hinglish, you may use simple conversational Hinglish. Be clear and concise. Do not claim to perform actions you cannot perform.'
@@ -124,8 +119,6 @@ exports.handler = async function (event) {
 
     const data = await upstream.json().catch(() => ({}));
 
-    // IMPORTANT:
-    // Return the REAL Gemini error so we can diagnose it.
     if (!upstream.ok) {
       const message =
         data &&
@@ -145,7 +138,6 @@ exports.handler = async function (event) {
       });
     }
 
-    // Get Gemini reply
     const reply =
       (
         data.candidates &&
